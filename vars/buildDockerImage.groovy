@@ -1,8 +1,8 @@
-def call() {
+def call(String dockerImageTag) {
     stage('Build Docker Image') {
         steps {
-            sh "docker build -t ${env.DOCKER_IMAGE_TAG} ."
-            echo "Build docker image ${env.DOCKER_IMAGE_TAG} Completed"
+            sh "docker build -t ${dockerImageTag} ."
+            echo "Build docker image ${dockerImageTag} Completed"
         }
     }
 }
