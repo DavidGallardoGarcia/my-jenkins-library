@@ -21,3 +21,12 @@ def localDeployDockerImage(String dockerImageTag) {
     sh "docker run -p 3000:3000 -d --name '${containerName}' --rm ${dockerImageTag}"
     echo 'Deploy Image Completed'
 }
+
+def k8sDeploy(String dockerImageTag, String kubeconfig) {
+    def deploymentYaml = 'kubernetes/node-deployment.yaml'
+    def serviceYaml = 'kubernetes/node-svc.yaml'
+
+    echo "Deploying resources"
+    sh "envsubst < '${deploymentYaml}' | kubectl --kubeconfig=${kubeconfig} apply -f -"
+    sh "kubectl --kubeconfig=$KUBECONFIG apply -f '${serviceYaml}'"
+}
