@@ -1,4 +1,14 @@
-def call(String dockerImageTag) {
+def buildDockerImage(String dockerImageTag) {
+    sh "docker build -t ${dockerImageTag} ."
+    echo "Build docker image ${dockerImageTag} Completed"
+}
+
+def pushDockerImage(String dockerImageTag) {
+    sh "docker push ${dockerImageTag}"
+    echo 'Push Image Completed'
+}
+
+def localDeployDockerImage(String dockerImageTag) {
     def containerName = 'my-nodejs-app'
     def containerExists = sh(script: "docker ps -a --format '{{.Names}}' | grep -q '^${containerName}\$'", returnStatus: true)
 
