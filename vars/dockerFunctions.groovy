@@ -9,11 +9,11 @@ def pushDockerImage(String dockerImageTag) {
 }
 
 def localDeployDockerImage(String dockerImageTag) {
-    def configFile = 'app.properties'
-    def config = readProperties file: configFile
-
-    def containerName = config.containerName
-    def ports = config.ports.split(',')
+    def props = new Properties()
+    props.load(new FileInputStream('app.properties'))
+    
+    def containerName = props.getProperty('containerName')
+    def ports = props.getProperty('ports')
 
     def containerExists = sh(script: "docker ps -a --format '{{.Names}}' | grep -q '^${containerName}\$'", returnStatus: true)
 
@@ -23,9 +23,9 @@ def localDeployDockerImage(String dockerImageTag) {
         echo "Remove container '${containerName}'"
     }
 
-    def portMappings = ports.collect { "-p ${it}" }.join(' ')
+    // def portMappings = ports.collect { "-p ${it}" }.join(' ')
     
-    sh "docker run ${portMappings} -d --name ${containerName} --rm ${dockerImageTag}"
+    sh "docker run ${ports} -d --name ${containerName} --rm ${dockerImageTag}"
     echo 'Deploy Image Completed'
 }
 
