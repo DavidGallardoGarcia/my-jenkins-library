@@ -8,8 +8,7 @@ def pushDockerImage(String dockerImageTag) {
     echo 'Push Image Completed'
 }
 
-def localDeployDockerImage(String dockerImageTag) {
-    def containerName = 'my-nodejs-app'
+def localDeployDockerImage(String dockerImageTag, String containerName) {
     def containerExists = sh(script: "docker ps -a --format '{{.Names}}' | grep -q '^${containerName}\$'", returnStatus: true)
 
     if (containerExists == 0) {
