@@ -8,9 +8,17 @@ def pushDockerImage(String dockerImageTag) {
     echo 'Push Image Completed'
 }
 
+def readProperties(String configFile) {
+    def props = [:] //empty map
+    configFile.split('\n').each { //read line by line
+        def (key, value) = it.split('=') //split key value
+        props[key.trim()] = value.trim() //concat key value
+    }
+    return props
+}
+
 def localDeployDockerImage(String dockerImageTag) {
-    def props = new Properties()
-    props.load(new FileInputStream('app.properties'))
+    def props = readProperties('app.properties')
     
     def containerName = props.getProperty('containerName')
     def ports = props.getProperty('ports')
