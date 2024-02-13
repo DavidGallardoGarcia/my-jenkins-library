@@ -8,35 +8,7 @@ def pushDockerImage(String dockerImageTag) {
     echo 'Push Image Completed'
 }
 
-def readProperties(String configFile) {
-    // def props = [:] //empty map
-    // configFile.split('\n').each { //read line by line
-    //     def (key, value) = it.split('=') //split key value
-    //     props[key.trim()] = value.trim() //concat key value
-    // }
-    // return props
-    def props = [:] // empty map
-    configFile.split('\n').each { line ->
-        // split each line into key and value
-        def keyValue = line.split('=')
-        if (keyValue.size() >= 2) {
-            def key = keyValue[0].trim()
-            def value = keyValue[1].trim()
-            props[key] = value
-        } else {
-            // Handle lines that don't contain the '=' character
-            println "Skipping line: $line"
-        }
-    }
-    return props
-}
-
-def localDeployDockerImage(String dockerImageTag) {
-    def props = readProperties('app.properties')
-    
-    def containerName = props.getProperty('containerName')
-    def ports = props.getProperty('ports')
-
+def localDeployDockerImage(String dockerImageTag, String containerName) {
     def containerExists = sh(script: "docker ps -a --format '{{.Names}}' | grep -q '^${containerName}\$'", returnStatus: true)
 
     if (containerExists == 0) {
@@ -44,10 +16,8 @@ def localDeployDockerImage(String dockerImageTag) {
         sh "docker rm -f '${containerName}'"
         echo "Remove container '${containerName}'"
     }
-
-    // def portMappings = ports.collect { "-p ${it}" }.join(' ')
     
-    sh "docker run ${ports} -d --name ${containerName} --rm ${dockerImageTag}"
+    sh "docker run -p 3000:3000 -d --name '${containerName}' --rm ${dockerImageTag}"
     echo 'Deploy Image Completed'
 }
 
