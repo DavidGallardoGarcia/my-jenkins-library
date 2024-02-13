@@ -8,7 +8,13 @@ def pushDockerImage(String dockerImageTag) {
     echo 'Push Image Completed'
 }
 
-def localDeployDockerImage(String dockerImageTag, String containerName) {
+def localDeployDockerImage(String dockerImageTag) {
+    def configFile = 'app.properties'
+    def config = readProperties file: configFile
+
+    def containerName = config.containerName
+    def ports = config.ports.split(',')
+
     def containerExists = sh(script: "docker ps -a --format '{{.Names}}' | grep -q '^${containerName}\$'", returnStatus: true)
 
     if (containerExists == 0) {
@@ -16,8 +22,10 @@ def localDeployDockerImage(String dockerImageTag, String containerName) {
         sh "docker rm -f '${containerName}'"
         echo "Remove container '${containerName}'"
     }
+
+    def portMappings = ports.collect { "-p ${it}" }.join(' ')
     
-    sh "docker run -p 3000:3000 -d --name '${containerName}' --rm ${dockerImageTag}"
+    sh "docker run ${portMappings} -d --name ${containerName} --rm ${dockerImageTag}"
     echo 'Deploy Image Completed'
 }
 
